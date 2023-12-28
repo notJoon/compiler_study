@@ -1,8 +1,6 @@
-use std::collections::{BTreeSet, HashMap, VecDeque};
+use std::collections::{BTreeSet, VecDeque};
 
-type State = usize;
-type Symbol = char;
-type TransitionTable = HashMap<(State, Option<Symbol>), BTreeSet<State>>;
+use crate::{State, Symbol, HopcraftTransitionTable};
 
 /// Calculate the epsilon closure of a state in an NFA.
 ///
@@ -19,7 +17,7 @@ type TransitionTable = HashMap<(State, Option<Symbol>), BTreeSet<State>>;
 /// # Returns
 ///
 /// A set of states that are in the epsilon closure of the given state.
-fn epsilon_closure(state: State, transitions: &TransitionTable) -> BTreeSet<State> {
+fn epsilon_closure(state: State, transitions: &HopcraftTransitionTable) -> BTreeSet<State> {
     let mut closure = BTreeSet::new();
     let mut stack = vec![state];
 
@@ -57,11 +55,11 @@ fn epsilon_closure(state: State, transitions: &TransitionTable) -> BTreeSet<Stat
 /// and the DFA transition table.
 fn subset_construction(
     start_state: State,
-    transitions: &TransitionTable,
+    transitions: &HopcraftTransitionTable,
     alphabet: &[Symbol],
-) -> (Vec<BTreeSet<State>>, TransitionTable) {
+) -> (Vec<BTreeSet<State>>, HopcraftTransitionTable) {
     let mut dfa_states = vec![epsilon_closure(start_state, transitions)];
-    let mut dfa_transitions = TransitionTable::new();
+    let mut dfa_transitions = HopcraftTransitionTable::new();
     let mut unmarked_states = VecDeque::new();
     unmarked_states.push_back(dfa_states[0].clone());
 
@@ -95,7 +93,7 @@ fn subset_construction(
 fn get_next_states(
     d_start: &BTreeSet<State>,
     a: &Symbol,
-    transitions: &TransitionTable,
+    transitions: &HopcraftTransitionTable,
 ) -> BTreeSet<State> {
     let mut u = BTreeSet::new();
 
@@ -116,7 +114,7 @@ mod tests {
 
     #[test]
     fn test_single_state_nfa() {
-        let transitions = TransitionTable::new(); // No transitions
+        let transitions = HopcraftTransitionTable::new(); // No transitions
         let alphabet = vec![];
         let start_state = 0;
 
@@ -129,7 +127,7 @@ mod tests {
 
     #[test]
     fn test_nfa_with_epsilon_transitions() {
-        let mut transitions = TransitionTable::new();
+        let mut transitions = HopcraftTransitionTable::new();
         transitions.insert((0, None), vec![1].into_iter().collect());
         transitions.insert((1, None), vec![2].into_iter().collect());
         let alphabet = vec![];
@@ -145,7 +143,7 @@ mod tests {
 
     #[test]
     fn test_nfa_one_symbol_no_epsilon() {
-        let mut transitions = TransitionTable::new();
+        let mut transitions = HopcraftTransitionTable::new();
         transitions.insert((0, Some('a')), vec![1].into_iter().collect());
         let alphabet = vec!['a'];
         let start_state = 0;
@@ -160,7 +158,7 @@ mod tests {
 
     #[test]
     fn test_nfa_multiple_transitions() {
-        let mut transitions = TransitionTable::new();
+        let mut transitions = HopcraftTransitionTable::new();
         transitions.insert((0, Some('a')), vec![1, 2].into_iter().collect());
         transitions.insert((1, Some('b')), vec![0].into_iter().collect());
         transitions.insert((2, Some('a')), vec![2].into_iter().collect());
@@ -177,7 +175,7 @@ mod tests {
 
     #[test]
     fn test_nfa_with_epsilon_and_symbols() {
-        let mut transitions = TransitionTable::new();
+        let mut transitions = HopcraftTransitionTable::new();
         transitions.insert((0, None), vec![1].into_iter().collect());
         transitions.insert((0, Some('a')), vec![0].into_iter().collect());
         transitions.insert((1, Some('b')), vec![2].into_iter().collect());
@@ -194,7 +192,7 @@ mod tests {
 
     #[test]
     fn test_nfa_with_overlapping_epsilon_closures() {
-        let mut transitions = TransitionTable::new();
+        let mut transitions = HopcraftTransitionTable::new();
         transitions.insert((0, None), vec![1].into_iter().collect());
         transitions.insert((1, None), vec![2].into_iter().collect());
         transitions.insert((0, Some('a')), vec![0, 1].into_iter().collect());
