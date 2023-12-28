@@ -3,7 +3,7 @@ use std::collections::{BTreeSet, HashMap};
 use crate::{State, Symbol};
 
 type StateSet = BTreeSet<State>;
-type HopcraftTransitionTable = HashMap<(State, Option<Symbol>), State>;
+type HopcroftTransitionTable = HashMap<(State, Option<Symbol>), State>;
 
 /// Performs Hopcroft's algorithm for DFA minimization.
 ///
@@ -36,7 +36,7 @@ type HopcraftTransitionTable = HashMap<(State, Option<Symbol>), State>;
 fn hopcroft_minimization(
     states: &StateSet,
     accepting_states: &StateSet,
-    transitions: &HopcraftTransitionTable,
+    transitions: &HopcroftTransitionTable,
     alphabet: &[Symbol],
 ) -> Vec<StateSet> {
     if accepting_states.is_empty() {
@@ -94,7 +94,7 @@ mod tests {
     use super::*;
 
     // Helper function to create transitions from a list of tuples
-    fn create_transitions(transitions: &[(State, Symbol, State)]) -> HopcraftTransitionTable {
+    fn create_transitions(transitions: &[(State, Symbol, State)]) -> HopcroftTransitionTable {
         transitions
             .iter()
             .cloned()
@@ -161,7 +161,7 @@ mod tests {
         let alphabet = vec!['a'];
 
         let minimized = hopcroft_minimization(&states, &accepting_states, &transitions, &alphabet);
-        println!("{:?}", minimized);
+        // println!("{:?}", minimized);
         assert_eq!(minimized.len(), 1); // All states become one non-accepting state
     }
 
